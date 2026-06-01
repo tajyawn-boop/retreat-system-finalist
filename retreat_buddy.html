@@ -385,8 +385,8 @@ async function switchTab(which) {
 function fillNameSelect() {
   const sel = document.getElementById('vol-name');
   const current = sel.value;
-  // 아직 도우미로 지원하지 않은 학생만 후보로
-  const candidates = applicants.filter(a => !a.buddyVolunteer);
+  // 후보 조건: 아직 도우미로 지원하지 않았고, 지원이 필요한 학생도 아닌 경우
+  const candidates = applicants.filter(a => !a.buddyVolunteer && !needsSupport(a));
   sel.innerHTML = '<option value="">이름을 선택하세요</option>' +
     candidates.map(a =>
       `<option value="${a.id}">${esc(a.name)}${a.grade ? ' (' + esc(a.grade) + ')' : ''}</option>`
@@ -419,6 +419,13 @@ async function submitVolunteer() {
   }
   if (me.buddyVolunteer) {
     toast('이미 도우미로 지원했어요');
+    btn.disabled = false;
+    btn.textContent = '도우미로 지원하기';
+    fillNameSelect();
+    return;
+  }
+  if (needsSupport(me)) {
+    toast('맞춤 지원을 요청한 학생은 도우미로 지원할 수 없어요');
     btn.disabled = false;
     btn.textContent = '도우미로 지원하기';
     fillNameSelect();
