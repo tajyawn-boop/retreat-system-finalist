@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수련회 참가 신청</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #eef4f3; --bg-2: #e0ebe9; --card: #ffffff;
+    --ink: #243230; --ink-soft: #5e6f6c; --ink-faint: #93a3a0;
+    --line: #d2e0dd; --teal: #2f8a82; --teal-deep: #226b64;
+    --coral: #e07a55; --amber: #d99c3a; --rose: #c25563;
+    --shadow: rgba(30, 60, 55, 0.13);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Gowun Dodum', sans-serif; background: var(--bg);
+    color: var(--ink); line-height: 1.7; -webkit-tap-highlight-color: transparent;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(circle at 12% 6%, rgba(47,138,130,0.10), transparent 40%),
+      radial-gradient(circle at 90% 8%, rgba(224,122,85,0.09), transparent 40%);
+  }
+  .wrap { max-width: 620px; margin: 0 auto; padding: 0 16px 90px; position: relative; z-index: 1; }
+  header { text-align: center; padding: 42px 14px 20px; }
+  .badge {
+    display: inline-block; font-family: 'Jua', sans-serif;
+    background: var(--teal); color: #fff; font-size: 0.9rem;
+    padding: 4px 16px; border-radius: 16px; margin-bottom: 12px;
+  }
+  h1 { font-family: 'Jua', sans-serif; font-size: 2.3rem; }
+  .tagline { color: var(--ink-soft); font-size: 0.96rem; margin-top: 4px; }
+
+  .note {
+    background: var(--bg-2); border-radius: 10px; padding: 12px 16px;
+    margin-bottom: 20px; font-size: 0.9rem; color: var(--ink-soft);
+  }
+  .note b { color: var(--teal-deep); }
+
+  .form-card {
+    background: var(--card); border: 2px solid var(--line);
+    border-radius: 16px; padding: 22px; box-shadow: 0 4px 14px var(--shadow);
+  }
+  .fld { margin-bottom: 16px; }
+  .fld:last-of-type { margin-bottom: 18px; }
+  .fld label {
+    display: block; font-family: 'Jua', sans-serif; font-size: 0.94rem;
+    margin-bottom: 5px;
+  }
+  .fld label .req { color: var(--rose); }
+  .fld .hint { font-size: 0.8rem; color: var(--ink-faint); font-weight: 400; }
+  .fld input, .fld select, .fld textarea {
+    width: 100%; font-family: 'Gowun Dodum', sans-serif; font-size: 0.97rem;
+    border: 2px solid var(--line); border-radius: 9px;
+    padding: 9px 12px; background: var(--bg); color: var(--ink);
+  }
+  .fld input:focus, .fld select:focus, .fld textarea:focus {
+    outline: none; border-color: var(--teal);
+  }
+  .fld textarea { resize: vertical; min-height: 56px; }
+  .fld-row { display: flex; gap: 10px; }
+  .fld-row .fld { flex: 1; }
+
+  .chips { display: flex; gap: 7px; flex-wrap: wrap; }
+  .chip {
+    font-size: 0.86rem; padding: 6px 13px; border-radius: 16px;
+    border: 2px solid var(--line); background: var(--bg);
+    color: var(--ink-soft); cursor: pointer; transition: all 0.14s;
+  }
+  .chip:hover { border-color: var(--amber); }
+  .chip.on { background: var(--amber); color: #fff; border-color: var(--amber); }
+
+  .privacy-box {
+    background: var(--bg-2); border-radius: 9px; padding: 11px 14px;
+    font-size: 0.84rem; color: var(--ink-soft); margin-bottom: 16px;
+    display: flex; gap: 9px; align-items: flex-start;
+  }
+  .privacy-box input { margin-top: 4px; flex-shrink: 0; width: 16px; height: 16px; }
+
+  .support-box {
+    background: var(--bg-2); border: 2px solid var(--line);
+    border-radius: 12px; padding: 16px; margin-bottom: 16px;
+  }
+  .support-intro {
+    font-size: 0.86rem; color: var(--ink-soft);
+    margin-bottom: 14px; line-height: 1.6;
+  }
+  .support-intro b { color: var(--teal-deep); font-family: 'Jua', sans-serif; }
+  .support-box .fld input, .support-box .fld select, .support-box .fld textarea {
+    background: var(--card);
+  }
+
+  .submit-btn {
+    width: 100%; font-family: 'Jua', sans-serif; font-size: 1.1rem;
+    padding: 13px; border: none; border-radius: 11px; cursor: pointer;
+    background: var(--teal); color: #fff; transition: all 0.14s;
+  }
+  .submit-btn:hover { background: var(--teal-deep); }
+
+  .done-card {
+    background: var(--card); border: 2px solid var(--teal);
+    border-radius: 16px; padding: 34px 22px; text-align: center;
+    box-shadow: 0 4px 14px var(--shadow);
+  }
+  .done-card .check {
+    width: 68px; height: 68px; border-radius: 50%; background: var(--teal);
+    color: #fff; font-size: 2.1rem; display: flex; align-items: center;
+    justify-content: center; margin: 0 auto 16px;
+  }
+  .done-card h2 { font-family: 'Jua', sans-serif; font-size: 1.5rem; margin-bottom: 8px; }
+  .done-card p { color: var(--ink-soft); font-size: 0.94rem; }
+  .btn {
+    font-family: 'Jua', sans-serif; font-size: 0.9rem;
+    padding: 9px 18px; border: 2px solid var(--teal); border-radius: 9px;
+    background: var(--teal); color: #fff; cursor: pointer; margin-top: 18px;
+  }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(90px);
+    background: var(--ink); color: #fff; font-family: 'Jua', sans-serif;
+    font-size: 0.94rem; padding: 11px 24px; border-radius: 22px; z-index: 200;
+    transition: transform 0.32s cubic-bezier(0.2,0,0.2,1);
+    box-shadow: 0 8px 20px var(--shadow);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  footer {
+    text-align: center; margin-top: 36px; padding-top: 20px;
+    border-top: 2px dashed var(--line); color: var(--ink-faint);
+    font-family: 'Jua', sans-serif; font-size: 0.86rem;
+  }
+  @media (max-width: 600px) {
+    h1 { font-size: 2rem; }
+    .fld-row { flex-direction: column; gap: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="badge">RETREAT REGISTRATION</div>
+    <h1>수련회 참가 신청</h1>
+    <p class="tagline">아래 항목을 채워 수련회 참가를 신청해주세요</p>
+  </header>
+
+  <div class="note">
+    수련회에 참가할 학생의 정보를 입력해주세요. <b>비상연락처와 알레르기 정보</b>는
+    안전을 위해 꼭 필요해요. <span style="color:var(--rose)">*</span> 표시는 필수 항목입니다.
+  </div>
+
+  <div class="form-card" id="apply-form">
+    <div class="fld-row">
+      <div class="fld">
+        <label>이름 <span class="req">*</span></label>
+        <input type="text" id="f-name" placeholder="홍길동">
+      </div>
+      <div class="fld">
+        <label>학년 / 반</label>
+        <input type="text" id="f-grade" placeholder="중2-3">
+      </div>
+    </div>
+    <div class="fld">
+      <label>본인 연락처 <span class="req">*</span></label>
+      <input type="tel" id="f-phone" placeholder="010-0000-0000">
+    </div>
+    <div class="fld">
+      <label>비상 연락처 (보호자) <span class="req">*</span> <span class="hint">— 위급 시 연락할 번호</span></label>
+      <input type="tel" id="f-emergency" placeholder="보호자 성함 / 전화번호">
+    </div>
+    <div class="fld">
+      <label>알레르기 / 못 먹는 음식 <span class="hint">— 해당하는 것을 모두 선택</span></label>
+      <div class="chips" id="allergy-chips">
+        <span class="chip" data-v="계란">계란</span>
+        <span class="chip" data-v="우유">우유</span>
+        <span class="chip" data-v="견과류">견과류</span>
+        <span class="chip" data-v="갑각류">갑각류</span>
+        <span class="chip" data-v="복숭아">복숭아</span>
+        <span class="chip" data-v="밀">밀</span>
+        <span class="chip" data-v="콩">콩</span>
+        <span class="chip" data-v="돼지고기">돼지고기</span>
+      </div>
+    </div>
+    <div class="fld">
+      <label>그 밖에 알아야 할 점 <span class="hint">— 복용 약, 건강 상태 등 (선택)</span></label>
+      <textarea id="f-health" placeholder="예: 천식이 있어 흡입기를 챙깁니다"></textarea>
+    </div>
+
+    <div class="support-box">
+      <p class="support-intro">
+        🤝 <b>참가자 맞춤 지원</b><br>
+        모든 학생이 편하게 함께할 수 있도록 미리 준비하고 싶어요.
+        도움이 필요한 부분이 있다면 아래에 알려주세요. 모두 선택 사항이에요.
+      </p>
+      <div class="fld">
+        <label>이동 / 활동 지원 <span class="hint">— 해당하는 것을 모두 선택</span></label>
+        <div class="chips" id="mobility-chips">
+          <span class="chip" data-v="휠체어 사용">휠체어 사용</span>
+          <span class="chip" data-v="보행 보조기구 사용">보행 보조기구 사용</span>
+          <span class="chip" data-v="계단 이동 시 도움 필요">계단 이동 시 도움 필요</span>
+          <span class="chip" data-v="긴 거리 이동 시 도움 필요">긴 거리 이동 시 도움 필요</span>
+          <span class="chip" data-v="화장실 이용 시 도움 필요">화장실 이용 시 도움 필요</span>
+        </div>
+      </div>
+      <div class="fld">
+        <label>활동지원사 / 보호자 동행 여부</label>
+        <select id="f-caregiver">
+          <option value="없음">동행 안 함</option>
+          <option value="활동지원사 동행">활동지원사 동행</option>
+          <option value="보호자 동행">보호자 동행</option>
+          <option value="상의 필요">담당 교사와 상의 필요</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label>숙소 / 자리 배정 요청 <span class="hint">— 해당하는 것을 모두 선택</span></label>
+        <div class="chips" id="room-chips">
+          <span class="chip" data-v="1층 숙소 배정">1층 숙소 배정</span>
+          <span class="chip" data-v="화장실 가까운 자리">화장실 가까운 자리</span>
+          <span class="chip" data-v="출입구 가까운 자리">출입구 가까운 자리</span>
+          <span class="chip" data-v="엘리베이터 근처">엘리베이터 근처</span>
+        </div>
+      </div>
+      <div class="fld" style="margin-bottom:0;">
+        <label>함께 준비하면 좋을 점 <span class="hint">— 그 밖에 필요한 도움을 자유롭게 적어주세요 (선택)</span></label>
+        <textarea id="f-support" placeholder="예: 야외 활동 시 그늘에서 쉴 공간이 있으면 좋겠어요"></textarea>
+      </div>
+    </div>
+
+    <div class="fld">
+      <label>회비 납부 여부</label>
+      <select id="f-paid">
+        <option value="false">아직 미납</option>
+        <option value="true">납부 완료</option>
+      </select>
+    </div>
+    <label class="privacy-box">
+      <input type="checkbox" id="f-consent">
+      <span>입력한 정보(연락처·건강정보·맞춤 지원 정보 포함)를 수련회 운영과 안전 관리 목적으로
+      교회 청소년부가 수집·이용하는 데 동의합니다. 정보는 수련회 종료 후 파기됩니다.</span>
+    </label>
+    <button class="submit-btn" onclick="submitApply()">참가 신청하기</button>
+  </div>
+
+  <div class="done-card" id="done-card" style="display:none;">
+    <div class="check">✓</div>
+    <h2>신청이 완료되었어요!</h2>
+    <p id="done-msg"></p>
+    <p style="margin-top:8px; font-size:0.86rem;">신청 내용은 담당 교사에게 전달됩니다.</p>
+    <button class="btn" onclick="resetForm()">한 명 더 신청하기</button>
+  </div>
+
+  <footer>수련회 참가 신청 — 청소년부 수련회</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================
+// JSONBin 공유 데이터베이스 — 신청·관리·도우미 세 파일 모두 같은 bin을 씁니다
+// ============================================
+const JSONBIN_URL = 'https://api.jsonbin.io/v3/b/6a1d67feddf5aa59f77f4d0d';
+const JSONBIN_KEY = '$2a$10$f5PkqpRL4utOtzy76evqcuOqjFQx.sqeBLlo3ui7uLauOBGKNSnd2';
+
+// 신청용 — 이 파일은 신청 접수만 합니다.
+
+// JSONBin에서 전체 명단을 불러옵니다 (비동기)
+async function loadList() {
+  try {
+    const r = await fetch(JSONBIN_URL + '/latest', {
+      headers: { 'X-Master-Key': JSONBIN_KEY, 'X-Bin-Meta': 'false' }
+    });
+    if (!r.ok) {
+      const txt = await r.text();
+      console.error('명단 불러오기 실패: HTTP', r.status, txt);
+      return null;
+    }
+    const data = await r.json();
+    const arr = (data && Array.isArray(data.applicants)) ? data.applicants : [];
+    return arr;
+  } catch (e) {
+    console.error('명단 불러오기 실패:', e);
+    return null;
+  }
+}
+// JSONBin에 전체 명단을 저장합니다 (비동기)
+async function saveList(arr) {
+  try {
+    const r = await fetch(JSONBIN_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': JSONBIN_KEY
+      },
+      body: JSON.stringify({ applicants: arr })
+    });
+    if (!r.ok) {
+      const txt = await r.text();
+      console.error('명단 저장 실패: HTTP', r.status, txt);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('명단 저장 실패:', e);
+    return false;
+  }
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function uid() { return 'r' + Date.now() + Math.floor(Math.random() * 999); }
+
+document.getElementById('allergy-chips').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (chip) chip.classList.toggle('on');
+});
+function getAllergies() {
+  return [...document.querySelectorAll('#allergy-chips .chip.on')].map(c => c.dataset.v);
+}
+
+document.getElementById('mobility-chips').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (chip) chip.classList.toggle('on');
+});
+document.getElementById('room-chips').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (chip) chip.classList.toggle('on');
+});
+function getChipValues(groupId) {
+  return [...document.querySelectorAll('#' + groupId + ' .chip.on')].map(c => c.dataset.v);
+}
+
+async function submitApply() {
+  const name = document.getElementById('f-name').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const emergency = document.getElementById('f-emergency').value.trim();
+  const consent = document.getElementById('f-consent').checked;
+  if (!name) { toast('이름을 입력해주세요'); return; }
+  if (!phone) { toast('본인 연락처를 입력해주세요'); return; }
+  if (!emergency) { toast('비상 연락처를 입력해주세요'); return; }
+  if (!consent) { toast('개인정보 수집 동의에 체크해주세요'); return; }
+
+  const btn = document.querySelector('.submit-btn');
+  btn.disabled = true;
+  btn.textContent = '접수 중...';
+
+  const list = await loadList();
+  if (list === null) {
+    toast('서버 연결에 실패했어요. 인터넷을 확인하고 다시 시도해주세요');
+    btn.disabled = false;
+    btn.textContent = '참가 신청하기';
+    return;
+  }
+  list.push({
+    id: uid(),
+    name,
+    grade: document.getElementById('f-grade').value.trim(),
+    phone,
+    emergency,
+    allergies: getAllergies(),
+    health: document.getElementById('f-health').value.trim(),
+    mobility: getChipValues('mobility-chips'),
+    caregiver: document.getElementById('f-caregiver').value,
+    roomRequests: getChipValues('room-chips'),
+    supportNote: document.getElementById('f-support').value.trim(),
+    paid: document.getElementById('f-paid').value === 'true',
+    at: new Date().toISOString()
+  });
+  const ok = await saveList(list);
+  if (!ok) {
+    toast('저장에 실패했어요. 잠시 후 다시 시도해주세요');
+    btn.disabled = false;
+    btn.textContent = '참가 신청하기';
+    return;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '참가 신청하기';
+  document.getElementById('apply-form').style.display = 'none';
+  const done = document.getElementById('done-card');
+  done.style.display = 'block';
+  document.getElementById('done-msg').textContent =
+    name + ' 학생의 수련회 참가 신청이 접수되었어요.';
+}
+
+function resetForm() {
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-grade').value = '';
+  document.getElementById('f-phone').value = '';
+  document.getElementById('f-emergency').value = '';
+  document.getElementById('f-health').value = '';
+  document.getElementById('f-caregiver').value = '없음';
+  document.getElementById('f-support').value = '';
+  document.getElementById('f-paid').value = 'false';
+  document.getElementById('f-consent').checked = false;
+  document.querySelectorAll('#allergy-chips .chip.on').forEach(c => c.classList.remove('on'));
+  document.querySelectorAll('#mobility-chips .chip.on').forEach(c => c.classList.remove('on'));
+  document.querySelectorAll('#room-chips .chip.on').forEach(c => c.classList.remove('on'));
+  document.getElementById('apply-form').style.display = 'block';
+  document.getElementById('done-card').style.display = 'none';
+}
+</script>
+</body>
+</html>

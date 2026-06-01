@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수련회 명단 관리 (교사용)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #eef4f3; --bg-2: #e0ebe9; --card: #ffffff;
+    --ink: #243230; --ink-soft: #5e6f6c; --ink-faint: #93a3a0;
+    --line: #d2e0dd; --teal: #2f8a82; --teal-deep: #226b64;
+    --coral: #e07a55; --amber: #d99c3a; --rose: #c25563;
+    --shadow: rgba(30, 60, 55, 0.13);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Gowun Dodum', sans-serif; background: var(--bg);
+    color: var(--ink); line-height: 1.7; -webkit-tap-highlight-color: transparent;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(circle at 12% 6%, rgba(47,138,130,0.10), transparent 40%),
+      radial-gradient(circle at 90% 8%, rgba(224,122,85,0.09), transparent 40%);
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px 90px; position: relative; z-index: 1; }
+  header { text-align: center; padding: 42px 14px 18px; }
+  .badge {
+    display: inline-block; font-family: 'Jua', sans-serif;
+    background: var(--teal-deep); color: #fff; font-size: 0.9rem;
+    padding: 4px 16px; border-radius: 16px; margin-bottom: 12px;
+  }
+  h1 { font-family: 'Jua', sans-serif; font-size: 2.3rem; }
+  .tagline { color: var(--ink-soft); font-size: 0.96rem; margin-top: 4px; }
+
+  /* 잠금 화면 */
+  .lock-screen {
+    background: var(--card); border: 2px solid var(--line);
+    border-radius: 16px; padding: 36px 24px; text-align: center;
+    box-shadow: 0 4px 14px var(--shadow); max-width: 380px;
+    margin: 20px auto 0;
+  }
+  .lock-screen .lock-ico {
+    width: 60px; height: 60px; border-radius: 50%; background: var(--bg-2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; margin: 0 auto 14px;
+  }
+  .lock-screen h2 { font-family: 'Jua', sans-serif; font-size: 1.3rem; margin-bottom: 6px; }
+  .lock-screen p { font-size: 0.88rem; color: var(--ink-soft); margin-bottom: 16px; }
+  .lock-screen input {
+    width: 100%; font-family: 'Gowun Dodum', sans-serif; font-size: 1.1rem;
+    text-align: center; letter-spacing: 0.2em;
+    border: 2px solid var(--line); border-radius: 10px;
+    padding: 11px; background: var(--bg); color: var(--ink); margin-bottom: 12px;
+  }
+  .lock-screen input:focus { outline: none; border-color: var(--teal); }
+  .lock-screen .lock-btn {
+    width: 100%; font-family: 'Jua', sans-serif; font-size: 1rem;
+    padding: 12px; border: none; border-radius: 10px; cursor: pointer;
+    background: var(--teal); color: #fff;
+  }
+  .lock-screen .lock-hint {
+    font-size: 0.78rem; color: var(--ink-faint); margin-top: 12px;
+  }
+
+  .manage-area { display: none; }
+  .manage-area.unlocked { display: block; }
+
+  .stat-row {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+    margin-bottom: 18px;
+  }
+  .stat-box {
+    background: var(--card); border: 2px solid var(--line);
+    border-radius: 12px; padding: 14px 10px; text-align: center;
+  }
+  .stat-box .num {
+    font-family: 'Jua', sans-serif; font-size: 1.8rem; color: var(--teal-deep);
+  }
+  .stat-box .lbl { font-size: 0.8rem; color: var(--ink-soft); }
+
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .btn {
+    font-family: 'Jua', sans-serif; font-size: 0.88rem;
+    padding: 8px 15px; border: 2px solid var(--line); border-radius: 9px;
+    background: var(--card); color: var(--ink); cursor: pointer;
+    transition: all 0.14s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.teal { background: var(--teal); color: #fff; border-color: var(--teal); }
+  .btn.danger { color: var(--rose); border-color: var(--rose); }
+
+  .applicant {
+    background: var(--card); border: 2px solid var(--line);
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .app-top {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .app-name { font-family: 'Jua', sans-serif; font-size: 1.1rem; }
+  .app-grade { font-size: 0.84rem; color: var(--ink-soft); }
+  .app-tag { font-size: 0.76rem; padding: 2px 9px; border-radius: 10px; }
+  .tag-paid { background: #dcefe4; color: var(--teal-deep); }
+  .tag-unpaid { background: #f6e3e0; color: var(--rose); }
+  .tag-allergy { background: #f7ecd4; color: #9c7320; }
+  .tag-support { background: #dde8f0; color: #2c5775; }
+  .app-spacer { flex: 1; }
+  .app-detail {
+    margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line);
+    font-size: 0.86rem; color: var(--ink-soft); display: none;
+  }
+  .app-detail.show { display: block; }
+  .app-detail div { margin-bottom: 3px; }
+  .app-actions { display: flex; gap: 6px; margin-top: 8px; }
+  .pay-toggle {
+    font-family: 'Jua', sans-serif; font-size: 0.8rem; padding: 5px 12px;
+    border-radius: 8px; border: none; cursor: pointer;
+  }
+  .pay-toggle.to-paid { background: var(--teal); color: #fff; }
+  .pay-toggle.to-unpaid { background: var(--bg-2); color: var(--ink-soft); }
+  .mini-x {
+    background: none; border: none; color: var(--ink-faint);
+    cursor: pointer; font-size: 0.9rem;
+  }
+  .mini-x:hover { color: var(--rose); }
+
+  .empty { text-align: center; padding: 46px 20px; color: var(--ink-faint); }
+  .empty .big { font-size: 2.4rem; margin-bottom: 8px; }
+
+  .privacy-reminder {
+    background: #f7ecd4; border-radius: 9px; padding: 11px 14px;
+    font-size: 0.83rem; color: #7d5d18; margin-bottom: 16px;
+  }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(90px);
+    background: var(--ink); color: #fff; font-family: 'Jua', sans-serif;
+    font-size: 0.94rem; padding: 11px 24px; border-radius: 22px; z-index: 200;
+    transition: transform 0.32s cubic-bezier(0.2,0,0.2,1);
+    box-shadow: 0 8px 20px var(--shadow);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  footer {
+    text-align: center; margin-top: 38px; padding-top: 20px;
+    border-top: 2px dashed var(--line); color: var(--ink-faint);
+    font-family: 'Jua', sans-serif; font-size: 0.86rem;
+  }
+  @media (max-width: 600px) {
+    h1 { font-size: 2rem; }
+    .stat-row { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="badge">교사 전용 · TEACHER ONLY</div>
+    <h1>수련회 명단 관리</h1>
+    <p class="tagline">신청자 명단을 확인하고 회비를 관리해요</p>
+  </header>
+
+  <!-- 잠금 화면 -->
+  <div class="lock-screen" id="lock-screen">
+    <div class="lock-ico">🔒</div>
+    <h2>교사 전용 화면입니다</h2>
+    <p>학생들의 개인정보가 담겨 있어요.<br>관리 비밀번호를 입력해주세요.</p>
+    <input type="password" id="pw-input" placeholder="비밀번호">
+    <button class="lock-btn" onclick="tryUnlock()">잠금 해제</button>
+    <div class="lock-hint" id="pw-hint">담당 교사 비밀번호를 입력하세요</div>
+  </div>
+
+  <!-- 관리 화면 -->
+  <div class="manage-area" id="manage-area">
+    <div class="privacy-reminder">
+      🔐 이 화면에는 학생들의 연락처·건강정보가 담겨 있습니다.
+      다른 사람이 보지 않도록 주의하고, 수련회 종료 후 전체 초기화로 정보를 파기해주세요.
+    </div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="num" id="st-total">0</div><div class="lbl">총 신청자</div></div>
+      <div class="stat-box"><div class="num" id="st-paid">0</div><div class="lbl">회비 납부</div></div>
+      <div class="stat-box"><div class="num" id="st-unpaid">0</div><div class="lbl">미납</div></div>
+      <div class="stat-box"><div class="num" id="st-allergy">0</div><div class="lbl">알레르기 주의</div></div>
+      <div class="stat-box"><div class="num" id="st-support">0</div><div class="lbl">지원 필요</div></div>
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="filter-btn" onclick="cycleFilter()">전체 보기</button>
+      <button class="btn" onclick="refreshList()">새로고침</button>
+      <button class="btn teal" onclick="exportCSV()">명단 내보내기 (CSV)</button>
+      <button class="btn danger" onclick="resetAll()">전체 초기화</button>
+      <button class="btn" onclick="lockAgain()">화면 잠그기</button>
+    </div>
+    <div id="applicant-list"></div>
+  </div>
+
+  <footer>수련회 명단 관리 — 교사 전용 도구</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================
+// JSONBin 공유 데이터베이스 — 세 파일 모두 같은 bin을 씁니다
+// 학생들이 각자 다른 기기에서 신청해도 한 곳에 모입니다
+// ============================================
+const JSONBIN_URL = 'https://api.jsonbin.io/v3/b/6a1d67feddf5aa59f77f4d0d';
+const JSONBIN_KEY = '$2a$10$f5PkqpRL4utOtzy76evqcuOqjFQx.sqeBLlo3ui7uLauOBGKNSnd2';
+
+let applicants = [];
+let filterMode = 'all';
+
+// JSONBin에서 전체 명단을 불러옵니다 (비동기)
+async function loadList() {
+  try {
+    const r = await fetch(JSONBIN_URL + '/latest', {
+      headers: { 'X-Master-Key': JSONBIN_KEY, 'X-Bin-Meta': 'false' }
+    });
+    if (!r.ok) {
+      const txt = await r.text();
+      console.error('명단 불러오기 실패: HTTP', r.status, txt);
+      return null;
+    }
+    const data = await r.json();
+    return (data && Array.isArray(data.applicants)) ? data.applicants : [];
+  } catch (e) {
+    console.error('명단 불러오기 실패:', e);
+    return null;
+  }
+}
+// 현재 applicants 배열을 JSONBin에 저장합니다 (비동기)
+async function saveList() {
+  try {
+    const r = await fetch(JSONBIN_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': JSONBIN_KEY
+      },
+      body: JSON.stringify({ applicants })
+    });
+    if (!r.ok) {
+      const txt = await r.text();
+      console.error('명단 저장 실패: HTTP', r.status, txt);
+      toast('저장에 실패했어요');
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('명단 저장 실패:', e);
+    toast('저장에 실패했어요. 인터넷을 확인해주세요');
+    return false;
+  }
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// 지원 필요 여부 — 이동지원/숙소요청/동행/자유기재 중 하나라도 있으면 true
+function needsSupport(a) {
+  const hasMobility = a.mobility && a.mobility.length > 0;
+  const hasRoom = a.roomRequests && a.roomRequests.length > 0;
+  const hasCaregiver = a.caregiver && a.caregiver !== '없음';
+  const hasNote = a.supportNote && a.supportNote.trim().length > 0;
+  return hasMobility || hasRoom || hasCaregiver || hasNote;
+}
+
+// 이 학생에게 배정된 도우미 이름들 (도우미 짝꿍 페이지에서 배정한 결과)
+function buddyNamesFor(a) {
+  if (!Array.isArray(a.assignedBuddies) || a.assignedBuddies.length === 0) return '';
+  return a.assignedBuddies.map(bid => {
+    const b = applicants.find(x => x.id === bid);
+    return esc(b ? b.name : '(삭제됨)');
+  }).join(', ');
+}
+
+// ============================================
+// 잠금 / 비밀번호
+// 비밀번호는 파일에 직접 정해져 있습니다. (시연용 — 코드에서 보입니다)
+// ============================================
+const TEACHER_PW = 'tajcat';
+
+(function initLock() {
+  const hint = document.getElementById('pw-hint');
+  hint.textContent = '담당 교사 비밀번호를 입력하세요';
+})();
+
+function tryUnlock() {
+  const input = document.getElementById('pw-input').value.trim();
+  if (!input) { toast('비밀번호를 입력해주세요'); return; }
+  if (input === TEACHER_PW) {
+    unlock();
+  } else {
+    toast('비밀번호가 올바르지 않아요');
+    document.getElementById('pw-input').value = '';
+  }
+}
+
+async function unlock() {
+  document.getElementById('lock-screen').style.display = 'none';
+  document.getElementById('manage-area').classList.add('unlocked');
+  const list = await loadList();
+  if (list === null) {
+    toast('서버 연결에 실패했어요. 인터넷을 확인하고 새로고침 버튼을 눌러주세요');
+    applicants = [];
+  } else {
+    applicants = list;
+  }
+  renderManage();
+}
+
+function lockAgain() {
+  document.getElementById('manage-area').classList.remove('unlocked');
+  document.getElementById('lock-screen').style.display = 'block';
+  document.getElementById('pw-input').value = '';
+}
+
+document.getElementById('pw-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') tryUnlock();
+});
+
+// ============================================
+// 명단 관리
+// ============================================
+function cycleFilter() {
+  const modes = ['all', 'paid', 'unpaid', 'allergy', 'support'];
+  const labels = { all: '전체 보기', paid: '납부자만', unpaid: '미납자만', allergy: '알레르기만', support: '지원 필요만' };
+  const idx = modes.indexOf(filterMode);
+  filterMode = modes[(idx + 1) % modes.length];
+  document.getElementById('filter-btn').textContent = labels[filterMode];
+  renderManage();
+}
+
+function renderManage() {
+  const total = applicants.length;
+  const paid = applicants.filter(a => a.paid).length;
+  const allergy = applicants.filter(a => a.allergies && a.allergies.length > 0).length;
+  const support = applicants.filter(needsSupport).length;
+  document.getElementById('st-total').textContent = total;
+  document.getElementById('st-paid').textContent = paid;
+  document.getElementById('st-unpaid').textContent = total - paid;
+  document.getElementById('st-allergy').textContent = allergy;
+  document.getElementById('st-support').textContent = support;
+
+  let list = applicants;
+  if (filterMode === 'paid') list = applicants.filter(a => a.paid);
+  else if (filterMode === 'unpaid') list = applicants.filter(a => !a.paid);
+  else if (filterMode === 'allergy') list = applicants.filter(a => a.allergies && a.allergies.length > 0);
+  else if (filterMode === 'support') list = applicants.filter(needsSupport);
+
+  const wrap = document.getElementById('applicant-list');
+  if (list.length === 0) {
+    wrap.innerHTML = '<div class="empty"><div class="big">📋</div>' +
+      (total === 0
+        ? '아직 신청자가 없어요.<br><span style="font-size:0.85rem">신청 폼으로 접수되면 여기 나타나요. "새로고침"을 눌러 최신 명단을 받아보세요.</span>'
+        : '해당하는 신청자가 없어요.') + '</div>';
+    return;
+  }
+
+  wrap.innerHTML = list.map(a => {
+    const hasAllergy = a.allergies && a.allergies.length > 0;
+    const hasSupport = needsSupport(a);
+    return `
+      <div class="applicant">
+        <div class="app-top" onclick="toggleDetail('${a.id}')" style="cursor:pointer;">
+          <span class="app-name">${esc(a.name)}</span>
+          <span class="app-grade">${esc(a.grade) || '학년 미입력'}</span>
+          <span class="app-tag ${a.paid ? 'tag-paid' : 'tag-unpaid'}">${a.paid ? '납부완료' : '미납'}</span>
+          ${hasAllergy ? '<span class="app-tag tag-allergy">알레르기</span>' : ''}
+          ${hasSupport ? '<span class="app-tag tag-support">지원 필요</span>' : ''}
+          <span class="app-spacer"></span>
+          <button class="mini-x" onclick="event.stopPropagation(); removeApplicant('${a.id}')">✕</button>
+        </div>
+        <div class="app-detail" id="detail-${a.id}">
+          <div>📞 본인: ${esc(a.phone)}</div>
+          <div>🆘 비상: ${esc(a.emergency)}</div>
+          ${hasAllergy ? `<div>⚠️ 알레르기: ${a.allergies.map(esc).join(', ')}</div>` : ''}
+          ${a.health ? `<div>💊 참고: ${esc(a.health)}</div>` : ''}
+          ${(a.mobility && a.mobility.length > 0) ? `<div>♿ 이동·활동 지원: ${a.mobility.map(esc).join(', ')}</div>` : ''}
+          ${(a.caregiver && a.caregiver !== '없음') ? `<div>👥 동행: ${esc(a.caregiver)}</div>` : ''}
+          ${(a.roomRequests && a.roomRequests.length > 0) ? `<div>🏠 숙소·자리 요청: ${a.roomRequests.map(esc).join(', ')}</div>` : ''}
+          ${a.supportNote ? `<div>🤝 함께 준비할 점: ${esc(a.supportNote)}</div>` : ''}
+          ${buddyNamesFor(a) ? `<div>👫 배정된 도우미: ${buddyNamesFor(a)}</div>` : ''}
+          ${a.buddyVolunteer ? `<div>🙋 이 학생은 도우미로 지원했어요</div>` : ''}
+          <div class="app-actions">
+            <button class="pay-toggle ${a.paid ? 'to-unpaid' : 'to-paid'}"
+              onclick="togglePaid('${a.id}')">
+              ${a.paid ? '미납으로 변경' : '납부 완료로 변경'}
+            </button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleDetail(id) {
+  const el = document.getElementById('detail-' + id);
+  if (el) el.classList.toggle('show');
+}
+async function togglePaid(id) {
+  const a = applicants.find(x => x.id === id);
+  if (!a) return;
+  a.paid = !a.paid;
+  await saveList();
+  renderManage();
+  const el = document.getElementById('detail-' + id);
+  if (el) el.classList.add('show');
+  toast(a.paid ? '납부 완료로 표시했어요' : '미납으로 표시했어요');
+}
+async function removeApplicant(id) {
+  const a = applicants.find(x => x.id === id);
+  if (!a) return;
+  if (!confirm(a.name + ' 학생의 신청을 삭제할까요?')) return;
+  applicants = applicants.filter(x => x.id !== id);
+  await saveList();
+  renderManage();
+  toast('신청을 삭제했어요');
+}
+
+function exportCSV() {
+  if (applicants.length === 0) { toast('내보낼 명단이 없어요'); return; }
+  const header = ['이름', '학년/반', '본인연락처', '비상연락처', '알레르기', '참고사항',
+                  '이동·활동지원', '동행', '숙소·자리요청', '함께준비할점', '배정된도우미', '도우미지원', '회비'];
+  const rows = applicants.map(a => [
+    a.name, a.grade || '', a.phone, a.emergency,
+    (a.allergies || []).join(' '), a.health || '',
+    (a.mobility || []).join(' '), a.caregiver || '',
+    (a.roomRequests || []).join(' '), a.supportNote || '',
+    buddyNamesFor(a), a.buddyVolunteer ? '지원함' : '',
+    a.paid ? '납부완료' : '미납'
+  ]);
+  const csv = [header, ...rows]
+    .map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(','))
+    .join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '수련회_신청명단.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('명단을 내보냈어요');
+}
+
+async function resetAll() {
+  if (!confirm('정말 전체 신청 명단을 초기화할까요?\n학생들의 개인정보가 모두 삭제됩니다. 되돌릴 수 없어요.')) return;
+  applicants = [];
+  await saveList();
+  renderManage();
+  toast('명단을 초기화했어요 — 개인정보가 파기되었습니다');
+}
+
+// 새로고침 — 다른 기기에서 새로 들어온 신청을 불러옵니다
+async function refreshList() {
+  const list = await loadList();
+  if (list === null) { toast('서버 연결에 실패했어요'); return; }
+  applicants = list;
+  renderManage();
+  toast('명단을 새로고침했어요');
+}
+</script>
+</body>
+</html>

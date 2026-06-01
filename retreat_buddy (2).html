@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수련회 도우미 짝꿍</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #eef4f3; --bg-2: #e0ebe9; --card: #ffffff;
+    --ink: #243230; --ink-soft: #5e6f6c; --ink-faint: #93a3a0;
+    --line: #d2e0dd; --teal: #2f8a82; --teal-deep: #226b64;
+    --coral: #e07a55; --amber: #d99c3a; --rose: #c25563;
+    --blue: #3f7da6; --blue-soft: #dde8f0;
+    --shadow: rgba(30, 60, 55, 0.13);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Gowun Dodum', sans-serif; background: var(--bg);
+    color: var(--ink); line-height: 1.7; -webkit-tap-highlight-color: transparent;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(circle at 12% 6%, rgba(47,138,130,0.10), transparent 40%),
+      radial-gradient(circle at 90% 8%, rgba(224,122,85,0.09), transparent 40%);
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px 90px; position: relative; z-index: 1; }
+  header { text-align: center; padding: 42px 14px 18px; }
+  .badge {
+    display: inline-block; font-family: 'Jua', sans-serif;
+    background: var(--teal); color: #fff; font-size: 0.9rem;
+    padding: 4px 16px; border-radius: 16px; margin-bottom: 12px;
+  }
+  h1 { font-family: 'Jua', sans-serif; font-size: 2.3rem; }
+  .tagline { color: var(--ink-soft); font-size: 0.96rem; margin-top: 4px; }
+
+  /* 탭 */
+  .tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+  .tab {
+    flex: 1; font-family: 'Jua', sans-serif; font-size: 0.95rem;
+    padding: 11px; border: 2px solid var(--line); border-radius: 11px;
+    background: var(--card); color: var(--ink-soft); cursor: pointer;
+    transition: all 0.14s; text-align: center;
+  }
+  .tab.on { background: var(--teal); color: #fff; border-color: var(--teal); }
+
+  .panel { display: none; }
+  .panel.on { display: block; }
+
+  .card {
+    background: var(--card); border: 2px solid var(--line);
+    border-radius: 16px; padding: 22px; box-shadow: 0 4px 14px var(--shadow);
+    margin-bottom: 14px;
+  }
+  .intro {
+    background: var(--bg-2); border-radius: 10px; padding: 12px 16px;
+    margin-bottom: 16px; font-size: 0.88rem; color: var(--ink-soft);
+  }
+  .intro b { color: var(--teal-deep); }
+
+  .fld { margin-bottom: 16px; }
+  .fld label {
+    display: block; font-family: 'Jua', sans-serif; font-size: 0.94rem;
+    margin-bottom: 5px;
+  }
+  .fld .hint { font-size: 0.8rem; color: var(--ink-faint); font-weight: 400; }
+  .fld select, .fld textarea, .fld input {
+    width: 100%; font-family: 'Gowun Dodum', sans-serif; font-size: 0.97rem;
+    border: 2px solid var(--line); border-radius: 9px;
+    padding: 9px 12px; background: var(--bg); color: var(--ink);
+  }
+  .fld select:focus, .fld textarea:focus, .fld input:focus {
+    outline: none; border-color: var(--teal);
+  }
+  .fld textarea { resize: vertical; min-height: 54px; }
+
+  .submit-btn {
+    width: 100%; font-family: 'Jua', sans-serif; font-size: 1.05rem;
+    padding: 13px; border: none; border-radius: 11px; cursor: pointer;
+    background: var(--teal); color: #fff; transition: all 0.14s;
+  }
+  .submit-btn:hover { background: var(--teal-deep); }
+  .submit-btn:disabled { background: var(--ink-faint); cursor: not-allowed; }
+
+  /* 잠금 화면 */
+  .lock-screen {
+    background: var(--card); border: 2px solid var(--line);
+    border-radius: 16px; padding: 36px 24px; text-align: center;
+    box-shadow: 0 4px 14px var(--shadow); max-width: 380px; margin: 0 auto;
+  }
+  .lock-screen .lock-ico {
+    width: 60px; height: 60px; border-radius: 50%; background: var(--bg-2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; margin: 0 auto 14px;
+  }
+  .lock-screen h2 { font-family: 'Jua', sans-serif; font-size: 1.3rem; margin-bottom: 6px; }
+  .lock-screen p { font-size: 0.88rem; color: var(--ink-soft); margin-bottom: 16px; }
+  .lock-screen input {
+    width: 100%; font-family: 'Gowun Dodum', sans-serif; font-size: 1.1rem;
+    text-align: center; letter-spacing: 0.2em;
+    border: 2px solid var(--line); border-radius: 10px;
+    padding: 11px; background: var(--bg); color: var(--ink); margin-bottom: 12px;
+  }
+  .lock-screen input:focus { outline: none; border-color: var(--teal); }
+  .lock-screen .lock-btn {
+    width: 100%; font-family: 'Jua', sans-serif; font-size: 1rem;
+    padding: 12px; border: none; border-radius: 10px; cursor: pointer;
+    background: var(--teal); color: #fff;
+  }
+  .lock-screen .lock-hint {
+    font-size: 0.78rem; color: var(--ink-faint); margin-top: 12px;
+  }
+  .teacher-body { display: none; }
+  .teacher-body.unlocked { display: block; }
+
+  /* 배정 카드 */
+  .need-card {
+    background: var(--card); border: 2px solid var(--line);
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .need-top { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+  .need-name { font-family: 'Jua', sans-serif; font-size: 1.1rem; }
+  .need-grade { font-size: 0.84rem; color: var(--ink-soft); }
+  .need-tag {
+    font-size: 0.76rem; padding: 2px 9px; border-radius: 10px;
+    background: var(--blue-soft); color: var(--blue);
+  }
+  .need-info {
+    font-size: 0.83rem; color: var(--ink-soft);
+    margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--line);
+  }
+  .need-info div { margin-bottom: 2px; }
+  .buddy-row {
+    display: flex; gap: 7px; align-items: center; flex-wrap: wrap;
+    margin-top: 9px;
+  }
+  .buddy-chip {
+    font-size: 0.84rem; padding: 4px 10px; border-radius: 14px;
+    background: var(--bg-2); color: var(--teal-deep);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .buddy-chip .x {
+    cursor: pointer; color: var(--ink-faint); font-weight: bold;
+  }
+  .buddy-chip .x:hover { color: var(--rose); }
+  .assign-select {
+    font-family: 'Gowun Dodum', sans-serif; font-size: 0.86rem;
+    border: 2px solid var(--line); border-radius: 8px;
+    padding: 5px 8px; background: var(--bg); color: var(--ink);
+  }
+  .assign-select:focus { outline: none; border-color: var(--teal); }
+  .no-buddy { font-size: 0.84rem; color: var(--ink-faint); }
+
+  /* 지원자 목록 */
+  .vol-item {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--card); border: 2px solid var(--line);
+    border-radius: 10px; padding: 9px 13px; margin-bottom: 7px;
+    font-size: 0.9rem;
+  }
+  .vol-item .vname { font-family: 'Jua', sans-serif; }
+  .vol-item .vgrade { color: var(--ink-soft); font-size: 0.82rem; }
+  .vol-item .vcount {
+    margin-left: auto; font-size: 0.78rem; color: var(--ink-faint);
+  }
+  .vol-item .vcount.full { color: var(--rose); }
+
+  .sect-title {
+    font-family: 'Jua', sans-serif; font-size: 1.05rem;
+    margin: 18px 0 9px; color: var(--teal-deep);
+  }
+  .empty { text-align: center; padding: 36px 20px; color: var(--ink-faint); }
+  .empty .big { font-size: 2.2rem; margin-bottom: 6px; }
+
+  .done-card {
+    background: var(--card); border: 2px solid var(--teal);
+    border-radius: 16px; padding: 32px 22px; text-align: center;
+    box-shadow: 0 4px 14px var(--shadow);
+  }
+  .done-card .check {
+    width: 64px; height: 64px; border-radius: 50%; background: var(--teal);
+    color: #fff; font-size: 2rem; display: flex; align-items: center;
+    justify-content: center; margin: 0 auto 14px;
+  }
+  .done-card h2 { font-family: 'Jua', sans-serif; font-size: 1.4rem; margin-bottom: 8px; }
+  .done-card p { color: var(--ink-soft); font-size: 0.92rem; }
+  .btn {
+    font-family: 'Jua', sans-serif; font-size: 0.88rem;
+    padding: 9px 18px; border: 2px solid var(--teal); border-radius: 9px;
+    background: var(--teal); color: #fff; cursor: pointer; margin-top: 16px;
+  }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(90px);
+    background: var(--ink); color: #fff; font-family: 'Jua', sans-serif;
+    font-size: 0.94rem; padding: 11px 24px; border-radius: 22px; z-index: 200;
+    transition: transform 0.32s cubic-bezier(0.2,0,0.2,1);
+    box-shadow: 0 8px 20px var(--shadow);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  footer {
+    text-align: center; margin-top: 36px; padding-top: 20px;
+    border-top: 2px dashed var(--line); color: var(--ink-faint);
+    font-family: 'Jua', sans-serif; font-size: 0.86rem;
+  }
+  @media (max-width: 600px) {
+    h1 { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="badge">BUDDY · 도우미 짝꿍</div>
+    <h1>수련회 도우미 짝꿍</h1>
+    <p class="tagline">함께하면 모두가 더 즐거운 수련회가 돼요</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab on" id="tab-vol" onclick="switchTab('vol')">🙋 도우미 지원하기</div>
+    <div class="tab" id="tab-teacher" onclick="switchTab('teacher')">🧑‍🏫 교사용 배정</div>
+  </div>
+
+  <!-- ============ 학생용: 도우미 지원 ============ -->
+  <div class="panel on" id="panel-vol">
+    <div class="card" id="vol-form-card">
+      <div class="intro">
+        🤝 도우미는 도움이 필요한 친구와 <b>함께 다니는 짝꿍</b>이에요.
+        대신 해주는 사람이 아니라, 같이 활동하고 같이 신앙생활하는 친구랍니다.
+        함께할 마음이 있다면 아래에서 신청해주세요!
+      </div>
+      <div class="fld">
+        <label>내 이름 <span class="hint">— 신청 명단에서 본인을 찾아주세요</span></label>
+        <select id="vol-name">
+          <option value="">이름을 선택하세요</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label>한마디 <span class="hint">— 교사에게 전하고 싶은 말 (선택)</span></label>
+        <textarea id="vol-note" placeholder="예: 작년에도 도우미를 해봤어요 / 같은 반 친구를 돕고 싶어요"></textarea>
+      </div>
+      <button class="submit-btn" id="vol-submit" onclick="submitVolunteer()">도우미로 지원하기</button>
+    </div>
+
+    <div class="done-card" id="vol-done" style="display:none;">
+      <div class="check">✓</div>
+      <h2>지원이 완료되었어요!</h2>
+      <p id="vol-done-msg"></p>
+      <p style="margin-top:8px; font-size:0.85rem;">담당 교사가 짝꿍을 정해드릴 거예요.</p>
+      <button class="btn" onclick="resetVolunteer()">다른 학생도 지원하기</button>
+    </div>
+
+    <div class="sect-title">🙋 지금까지 지원한 도우미</div>
+    <div id="vol-list"></div>
+  </div>
+
+  <!-- ============ 교사용: 배정 ============ -->
+  <div class="panel" id="panel-teacher">
+    <!-- 잠금 -->
+    <div class="lock-screen" id="lock-screen">
+      <div class="lock-ico">🔒</div>
+      <h2>교사 전용 화면입니다</h2>
+      <p>명단 관리와 같은 비밀번호를 입력해주세요.</p>
+      <input type="password" id="pw-input" placeholder="비밀번호">
+      <button class="lock-btn" onclick="tryUnlock()">잠금 해제</button>
+      <div class="lock-hint" id="pw-hint">명단 관리 페이지와 같은 비밀번호예요</div>
+    </div>
+
+    <!-- 배정 화면 -->
+    <div class="teacher-body" id="teacher-body">
+      <div class="intro">
+        🧑‍🏫 도움이 필요한 학생에게 도우미를 <b>최대 2명</b>까지 배정할 수 있어요.
+        지원한 학생 중에서 골라주세요. 배정 결과는 명단 관리 페이지에도 함께 나타납니다.
+      </div>
+      <div class="sect-title">🤝 도우미 배정</div>
+      <div id="need-list"></div>
+    </div>
+  </div>
+
+  <footer>수련회 도우미 짝꿍 — 청소년부 수련회</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================
+// JSONBin 공유 데이터베이스 — 신청·관리·도우미 세 파일 모두 같은 bin
+// ============================================
+const JSONBIN_URL = 'https://api.jsonbin.io/v3/b/6a1d67feddf5aa59f77f4d0d';
+const JSONBIN_KEY = '$2a$10$f5PkqpRL4utOtzy76evqcuOqjFQx.sqeBLlo3ui7uLauOBGKNSnd2';
+const MAX_BUDDIES = 2;     // 학생 1명당 도우미 최대 인원
+let applicants = [];
+
+async function loadList() {
+  try {
+    const r = await fetch(JSONBIN_URL + '/latest', {
+      headers: { 'X-Master-Key': JSONBIN_KEY, 'X-Bin-Meta': 'false' }
+    });
+    if (!r.ok) {
+      const txt = await r.text();
+      console.error('명단 불러오기 실패: HTTP', r.status, txt);
+      return null;
+    }
+    const data = await r.json();
+    return (data && Array.isArray(data.applicants)) ? data.applicants : [];
+  } catch (e) {
+    console.error('명단 불러오기 실패:', e);
+    return null;
+  }
+}
+async function saveList() {
+  try {
+    const r = await fetch(JSONBIN_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': JSONBIN_KEY
+      },
+      body: JSON.stringify({ applicants })
+    });
+    if (!r.ok) {
+      const txt = await r.text();
+      console.error('명단 저장 실패: HTTP', r.status, txt);
+      toast('저장에 실패했어요');
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('명단 저장 실패:', e);
+    toast('저장에 실패했어요. 인터넷을 확인해주세요');
+    return false;
+  }
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// 지원 필요 여부 — 관리 페이지와 동일한 기준
+function needsSupport(a) {
+  const hasMobility = a.mobility && a.mobility.length > 0;
+  const hasRoom = a.roomRequests && a.roomRequests.length > 0;
+  const hasCaregiver = a.caregiver && a.caregiver !== '없음';
+  const hasNote = a.supportNote && a.supportNote.trim().length > 0;
+  return hasMobility || hasRoom || hasCaregiver || hasNote;
+}
+// 한 도우미가 현재 몇 명을 맡고 있는지
+function buddyLoad(volId) {
+  return applicants.filter(a =>
+    Array.isArray(a.assignedBuddies) && a.assignedBuddies.includes(volId)
+  ).length;
+}
+
+// ============================================
+// 탭 전환
+// ============================================
+async function switchTab(which) {
+  document.getElementById('tab-vol').classList.toggle('on', which === 'vol');
+  document.getElementById('tab-teacher').classList.toggle('on', which === 'teacher');
+  document.getElementById('panel-vol').classList.toggle('on', which === 'vol');
+  document.getElementById('panel-teacher').classList.toggle('on', which === 'teacher');
+  if (which === 'vol') {
+    const list = await loadList();
+    if (list !== null) applicants = list;
+    renderVolList();
+    fillNameSelect();
+  }
+}
+
+// ============================================
+// 학생용 — 도우미 지원
+// ============================================
+function fillNameSelect() {
+  const sel = document.getElementById('vol-name');
+  const current = sel.value;
+  // 아직 도우미로 지원하지 않은 학생만 후보로
+  const candidates = applicants.filter(a => !a.buddyVolunteer);
+  sel.innerHTML = '<option value="">이름을 선택하세요</option>' +
+    candidates.map(a =>
+      `<option value="${a.id}">${esc(a.name)}${a.grade ? ' (' + esc(a.grade) + ')' : ''}</option>`
+    ).join('');
+  if (current) sel.value = current;
+}
+
+async function submitVolunteer() {
+  const id = document.getElementById('vol-name').value;
+  if (!id) { toast('명단에서 본인 이름을 선택해주세요'); return; }
+
+  const btn = document.getElementById('vol-submit');
+  btn.disabled = true;
+  btn.textContent = '지원 중...';
+
+  const list = await loadList();
+  if (list === null) {
+    toast('서버 연결에 실패했어요. 다시 시도해주세요');
+    btn.disabled = false;
+    btn.textContent = '도우미로 지원하기';
+    return;
+  }
+  applicants = list;
+  const me = applicants.find(a => a.id === id);
+  if (!me) {
+    toast('신청 명단에서 찾을 수 없어요');
+    btn.disabled = false;
+    btn.textContent = '도우미로 지원하기';
+    return;
+  }
+  if (me.buddyVolunteer) {
+    toast('이미 도우미로 지원했어요');
+    btn.disabled = false;
+    btn.textContent = '도우미로 지원하기';
+    fillNameSelect();
+    return;
+  }
+
+  me.buddyVolunteer = true;
+  me.buddyNote = document.getElementById('vol-note').value.trim();
+  const ok = await saveList();
+  if (!ok) {
+    btn.disabled = false;
+    btn.textContent = '도우미로 지원하기';
+    return;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '도우미로 지원하기';
+  document.getElementById('vol-form-card').style.display = 'none';
+  const done = document.getElementById('vol-done');
+  done.style.display = 'block';
+  document.getElementById('vol-done-msg').textContent =
+    me.name + ' 학생이 도우미로 지원했어요. 고마워요!';
+  renderVolList();
+}
+
+function resetVolunteer() {
+  document.getElementById('vol-name').value = '';
+  document.getElementById('vol-note').value = '';
+  document.getElementById('vol-form-card').style.display = 'block';
+  document.getElementById('vol-done').style.display = 'none';
+  fillNameSelect();
+}
+
+function renderVolList() {
+  const vols = applicants.filter(a => a.buddyVolunteer);
+  const wrap = document.getElementById('vol-list');
+  if (vols.length === 0) {
+    wrap.innerHTML = '<div class="empty"><div class="big">🙋</div>' +
+      '아직 지원한 도우미가 없어요.<br>' +
+      '<span style="font-size:0.85rem">첫 번째 도우미가 되어보세요!</span></div>';
+    return;
+  }
+  wrap.innerHTML = vols.map(v => {
+    const load = buddyLoad(v.id);
+    const full = load >= MAX_BUDDIES;
+    return `<div class="vol-item">
+      <span class="vname">${esc(v.name)}</span>
+      <span class="vgrade">${esc(v.grade) || ''}</span>
+      <span class="vcount ${full ? 'full' : ''}">${
+        load > 0 ? load + '명 짝꿍 배정됨' : '아직 배정 전'
+      }</span>
+    </div>`;
+  }).join('');
+}
+
+// ============================================
+// 교사용 — 잠금
+// 비밀번호는 명단 관리 페이지와 동일하게 파일에 정해져 있습니다. (시연용)
+// ============================================
+const TEACHER_PW = 'tajcat';
+
+(function initLock() {
+  const hint = document.getElementById('pw-hint');
+  hint.textContent = '명단 관리 페이지와 같은 비밀번호예요';
+})();
+
+function tryUnlock() {
+  const input = document.getElementById('pw-input').value.trim();
+  if (!input) { toast('비밀번호를 입력해주세요'); return; }
+  if (input === TEACHER_PW) {
+    unlock();
+  } else {
+    toast('비밀번호가 올바르지 않아요');
+    document.getElementById('pw-input').value = '';
+  }
+}
+
+async function unlock() {
+  document.getElementById('lock-screen').style.display = 'none';
+  document.getElementById('teacher-body').classList.add('unlocked');
+  await refreshNeedList();
+}
+
+// JSONBin에서 최신 명단을 불러와 배정 화면을 다시 그립니다
+async function refreshNeedList() {
+  const list = await loadList();
+  if (list === null) {
+    toast('서버 연결에 실패했어요. 인터넷을 확인해주세요');
+    return;
+  }
+  applicants = list;
+  renderNeedList();
+}
+
+document.getElementById('pw-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') tryUnlock();
+});
+
+// ============================================
+// 교사용 — 배정
+// ============================================
+// 화면만 다시 그립니다 (데이터는 이미 applicants에 있다고 가정)
+function renderNeedList() {
+  // 지원이 필요한 학생을 우선 표시
+  const needList = applicants.filter(needsSupport);
+  const wrap = document.getElementById('need-list');
+
+  if (applicants.length === 0) {
+    wrap.innerHTML = '<div class="empty"><div class="big">📋</div>' +
+      '아직 신청자가 없어요.</div>';
+    return;
+  }
+  if (needList.length === 0) {
+    wrap.innerHTML = '<div class="empty"><div class="big">🤝</div>' +
+      '도우미가 필요한 학생이 아직 없어요.<br>' +
+      '<span style="font-size:0.85rem">신청 폼에서 맞춤 지원을 요청한 학생이 여기 나타나요.</span></div>';
+    return;
+  }
+
+  const volunteers = applicants.filter(a => a.buddyVolunteer);
+
+  wrap.innerHTML = needList.map(s => {
+    const assigned = Array.isArray(s.assignedBuddies) ? s.assignedBuddies : [];
+    const canAssignMore = assigned.length < MAX_BUDDIES;
+
+    // 배정된 도우미 칩
+    const chips = assigned.map(bid => {
+      const b = applicants.find(a => a.id === bid);
+      const bname = b ? b.name : '(삭제됨)';
+      return `<span class="buddy-chip">🤝 ${esc(bname)}
+        <span class="x" onclick="unassign('${s.id}','${bid}')">✕</span></span>`;
+    }).join('');
+
+    // 배정 가능한 지원자 (본인 제외, 이미 이 학생에게 배정된 사람 제외, 정원 찬 사람 제외)
+    const options = volunteers
+      .filter(v => v.id !== s.id && !assigned.includes(v.id) && buddyLoad(v.id) < MAX_BUDDIES)
+      .map(v => `<option value="${v.id}">${esc(v.name)}${
+        v.grade ? ' (' + esc(v.grade) + ')' : ''
+      }</option>`).join('');
+
+    let assignControl;
+    if (!canAssignMore) {
+      assignControl = `<span class="no-buddy">도우미 ${MAX_BUDDIES}명 배정 완료</span>`;
+    } else if (options === '') {
+      assignControl = `<span class="no-buddy">배정 가능한 지원자가 없어요</span>`;
+    } else {
+      assignControl = `<select class="assign-select" id="sel-${s.id}">
+          <option value="">＋ 도우미 선택</option>${options}
+        </select>
+        <button class="btn" style="margin:0; padding:5px 13px; font-size:0.8rem;"
+          onclick="assign('${s.id}')">배정</button>`;
+    }
+
+    // 지원 정보 요약
+    const info = [];
+    if (s.mobility && s.mobility.length) info.push('♿ ' + s.mobility.map(esc).join(', '));
+    if (s.caregiver && s.caregiver !== '없음') info.push('👥 ' + esc(s.caregiver));
+    if (s.roomRequests && s.roomRequests.length) info.push('🏠 ' + s.roomRequests.map(esc).join(', '));
+    if (s.supportNote) info.push('🤝 ' + esc(s.supportNote));
+
+    return `<div class="need-card">
+      <div class="need-top">
+        <span class="need-name">${esc(s.name)}</span>
+        <span class="need-grade">${esc(s.grade) || '학년 미입력'}</span>
+        <span class="need-tag">지원 필요</span>
+      </div>
+      ${info.length ? `<div class="need-info">${info.map(x => '<div>' + x + '</div>').join('')}</div>` : ''}
+      <div class="buddy-row">
+        ${chips || '<span class="no-buddy">아직 배정된 도우미가 없어요</span>'}
+      </div>
+      <div class="buddy-row">
+        ${assignControl}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function assign(studentId) {
+  const sel = document.getElementById('sel-' + studentId);
+  if (!sel || !sel.value) { toast('배정할 도우미를 선택해주세요'); return; }
+  const buddyId = sel.value;
+
+  const list = await loadList();
+  if (list === null) { toast('서버 연결에 실패했어요'); return; }
+  applicants = list;
+  const student = applicants.find(a => a.id === studentId);
+  if (!student) { toast('학생을 찾을 수 없어요'); renderNeedList(); return; }
+  if (!Array.isArray(student.assignedBuddies)) student.assignedBuddies = [];
+  if (student.assignedBuddies.length >= MAX_BUDDIES) {
+    toast('도우미는 최대 ' + MAX_BUDDIES + '명까지 배정할 수 있어요'); renderNeedList(); return;
+  }
+  if (student.assignedBuddies.includes(buddyId)) {
+    toast('이미 배정된 도우미예요'); renderNeedList(); return;
+  }
+  if (buddyLoad(buddyId) >= MAX_BUDDIES) {
+    toast('이 도우미는 이미 ' + MAX_BUDDIES + '명을 맡고 있어요'); renderNeedList(); return;
+  }
+  student.assignedBuddies.push(buddyId);
+  const ok = await saveList();
+  if (!ok) return;
+  renderNeedList();
+  const b = applicants.find(a => a.id === buddyId);
+  toast((b ? b.name : '도우미') + ' 학생을 배정했어요');
+}
+
+async function unassign(studentId, buddyId) {
+  const list = await loadList();
+  if (list === null) { toast('서버 연결에 실패했어요'); return; }
+  applicants = list;
+  const student = applicants.find(a => a.id === studentId);
+  if (!student || !Array.isArray(student.assignedBuddies)) { renderNeedList(); return; }
+  student.assignedBuddies = student.assignedBuddies.filter(id => id !== buddyId);
+  const ok = await saveList();
+  if (!ok) return;
+  renderNeedList();
+  toast('배정을 취소했어요');
+}
+
+// ============================================
+// 시작 — JSONBin에서 명단을 불러옵니다
+// ============================================
+(async function init() {
+  const list = await loadList();
+  if (list !== null) applicants = list;
+  fillNameSelect();
+  renderVolList();
+})();
+</script>
+</body>
+</html>
